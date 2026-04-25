@@ -6,5 +6,5 @@ export function getModel() {
     throw new Error("GEMINI_API_KEY が設定されていません。.env.local を確認してください。");
   }
   const genAI = new GoogleGenerativeAI(apiKey);
-  return genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+  return genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 }
