@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import toast from "react-hot-toast";
 import Sidebar from "@/components/Sidebar";
 import OutputPanel from "@/components/OutputPanel";
 import LanguageToggle from "@/components/LanguageToggle";
@@ -14,19 +15,17 @@ export default function BlogPage() {
   const [lang, setLang] = useState<Language>("ja");
   const [output, setOutput] = useState("");
   const [isStreaming, setIsStreaming] = useState(false);
-  const [error, setError] = useState("");
 
   const handleSelectHistory = (item: HistoryItem) => {
     setOutput(item.content);
     setLang(item.lang as Language);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (e?: React.FormEvent | React.KeyboardEvent) => {
+    e?.preventDefault();
     if (!theme.trim()) return;
 
     setOutput("");
-    setError("");
     setIsStreaming(true);
 
     try {
@@ -38,7 +37,7 @@ export default function BlogPage() {
 
       if (!res.ok) {
         const { error } = await res.json();
-        setError(error ?? "エラーが発生しました");
+        toast.error(error ?? "エラーが発生しました");
         return;
       }
 
@@ -56,14 +55,9 @@ export default function BlogPage() {
         }
       }
 
-      saveHistory({
-        tool: "blog",
-        title: theme,
-        content: fullText,
-        lang,
-      });
+      saveHistory({ tool: "blog", title: theme, content: fullText, lang });
     } catch {
-      setError("ネットワークエラーが発生しました");
+      toast.error("ネットワークエラーが発生しました");
     } finally {
       setIsStreaming(false);
     }
@@ -73,8 +67,8 @@ export default function BlogPage() {
     <div className="flex h-screen bg-white">
       <Sidebar onSelectHistory={handleSelectHistory} />
 
-      <main className="flex-1 flex flex-col min-w-0 p-6 overflow-hidden">
-        <div className="flex items-center justify-between mb-6">
+      <main className="flex-1 flex flex-col min-w-0 p-4 md:p-6 overflow-hidden pt-16 md:pt-6">
+        <div className="flex items-center justify-between mb-4 md:mb-6">
           <div>
             <h2 className="text-lg font-semibold text-gray-900">ブログ記事生成</h2>
             <p className="text-sm text-gray-500 mt-0.5">テーマを入力するとMarkdown形式の記事を生成します</p>
@@ -82,9 +76,15 @@ export default function BlogPage() {
           <LanguageToggle value={lang} onChange={setLang} />
         </div>
 
-        <div className="flex gap-6 flex-1 min-h-0">
+        <div className="flex flex-col md:flex-row gap-4 md:gap-6 flex-1 min-h-0 overflow-y-auto md:overflow-hidden">
           {/* Input */}
-          <form onSubmit={handleSubmit} className="w-72 shrink-0 flex flex-col gap-4">
+          <form
+            onSubmit={handleSubmit}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) handleSubmit(e);
+            }}
+            className="w-full md:w-72 md:shrink-0 flex flex-col gap-4"
+          >
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">
                 テーマ <span className="text-red-400">*</span>
@@ -128,21 +128,19 @@ export default function BlogPage() {
               </select>
             </div>
 
-            {error && (
-              <p className="text-sm text-red-500 bg-red-50 rounded-md px-3 py-2">{error}</p>
-            )}
+            <p className="text-xs text-gray-400">Ctrl + Enter で生成</p>
 
             <button
               type="submit"
               disabled={isStreaming || !theme.trim()}
-              className="mt-auto w-full rounded-md bg-gray-900 text-white py-2.5 text-sm font-medium hover:bg-gray-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+              className="md:mt-auto w-full rounded-md bg-gray-900 text-white py-2.5 text-sm font-medium hover:bg-gray-700 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
             >
               {isStreaming ? "生成中..." : "生成する"}
             </button>
           </form>
 
           {/* Output */}
-          <div className="flex-1 min-w-0">
+          <div className="flex-1 min-w-0 min-h-64 md:min-h-0">
             <OutputPanel
               content={output}
               isStreaming={isStreaming}

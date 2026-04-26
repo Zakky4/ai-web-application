@@ -8,10 +8,13 @@
 ## 技術スタック
 | 要素 | 選択 |
 |------|------|
-| フレームワーク | Next.js 14 (App Router) + TypeScript |
-| スタイリング | Tailwind CSS |
-| AIモデル | Gemini 1.5 Flash（`@google/generative-ai`）|
+| フレームワーク | Next.js (App Router) + TypeScript |
+| スタイリング | Tailwind CSS v4 |
+| フォント | Noto Sans JP（`next/font/google`） |
+| AIモデル | Gemini 2.5 Flash（`@google/generative-ai`）|
 | 状態管理 | React useState + localStorage |
+| Markdownレンダリング | react-markdown |
+| トースト通知 | react-hot-toast |
 | デプロイ | Vercel（任意） |
 
 ---
@@ -21,7 +24,7 @@
 ai-web-application/
 ├── src/
 │   ├── app/
-│   │   ├── layout.tsx          # 共通レイアウト（Sidebar付き）
+│   │   ├── layout.tsx          # 共通レイアウト（Noto Sans JP・Toaster）
 │   │   ├── page.tsx            # トップ（/blog へリダイレクト）
 │   │   ├── blog/page.tsx       # ブログ記事生成ページ
 │   │   ├── email/page.tsx      # メール作成ページ
@@ -31,9 +34,8 @@ ai-web-application/
 │   │       ├── email/route.ts
 │   │       └── summarize/route.ts
 │   ├── components/
-│   │   ├── Sidebar.tsx         # ナビゲーション（ブログ/メール/要約）
-│   │   ├── ToolLayout.tsx      # 入力+出力の共通レイアウト
-│   │   ├── OutputPanel.tsx     # 生成結果表示・コピー・DLボタン
+│   │   ├── Sidebar.tsx         # ナビゲーション（デスクトップ固定・モバイルドロワー）
+│   │   ├── OutputPanel.tsx     # 生成結果表示（Markdownレンダリング）・コピー・DLボタン
 │   │   ├── LanguageToggle.tsx  # 日英切り替えUI
 │   │   └── HistoryDrawer.tsx   # 過去の生成履歴パネル
 │   └── lib/
@@ -65,36 +67,30 @@ ai-web-application/
 
 ---
 
-## 実装ステップ
+## 実装済みの改善
 
-### Step 1 — プロジェクト初期化
-```bash
-npx create-next-app@latest . --typescript --tailwind --app --src-dir --import-alias "@/*"
-npm install @google/generative-ai
-```
+### フォント変更
+- Geist → Noto Sans JP（weight: 400/500/700）
+- `next/font/google` で自己ホスティング、CSS変数 `--font-noto-sans-jp` 経由で全体適用
 
-### Step 2 — Gemini クライアント（src/lib/gemini.ts）
-- `GoogleGenerativeAI` を初期化して `gemini-1.5-flash` モデルを使う
-- ストリーミングレスポンス対応（`generateContentStream`）でUX向上
+### Markdownレンダリング
+- `OutputPanel.tsx` に `react-markdown` を導入
+- 見出し・箇条書き・太字・コードブロック・引用をHTMLにレンダリング
+- 各要素にTailwindクラスで統一スタイルを適用
 
-### Step 3 — APIルート（3本）
-- リクエストのパラメータをプロンプトテンプレートに組み込む
-- Gemini APIを呼び出してストリーミングで返す
-- エラーハンドリング（API超過・ネットワークエラー）
+### Ctrl+Enter ショートカット
+- 全フォームに `onKeyDown` ハンドラを追加（Ctrl/⌘ + Enter で生成実行）
+- テキストエリアには個別にも追加（通常Enterとの競合を防止）
 
-### Step 4 — プロンプトテンプレート（src/lib/prompts.ts）
-- 言語（日/英）に応じてプロンプトを切り替え
-- 各機能に適したシステムプロンプトを定義
+### モバイル対応
+- `Sidebar`: デスクトップは固定表示（`hidden md:flex`）、モバイルはハンバーガーボタン + ドロワー
+- 各ページのコンテンツエリア: `flex-col md:flex-row`（モバイルで縦積み）
+- `main` に `pt-16 md:pt-6` を設定してモバイルトップバーとの重なりを回避
 
-### Step 5 — UIコンポーネント
-- `Sidebar`: 3ツールへのナビゲーション + 履歴ボタン
-- `ToolLayout`: 左=入力フォーム、右=OutputPanel の2カラム
-- `OutputPanel`: 生成テキスト表示、コピーボタン、.mdダウンロードボタン
-- `HistoryDrawer`: localStorage から過去20件を表示
-
-### Step 6 — localStorage 履歴
-- `src/lib/history.ts` で保存・取得・削除のヘルパーを作る
-- 最大20件、古いものから自動削除
+### トースト通知
+- `react-hot-toast` の `<Toaster>` を `layout.tsx` に設置
+- 各ページのインラインエラー表示を `toast.error()` に置き換え
+- Noto Sans JP フォント・既存配色（赤系ボーダー）に合わせたスタイル
 
 ---
 
@@ -113,4 +109,6 @@ GEMINI_API_KEY=your_api_key_here
 4. 要約: 長い文章を貼り付けて要約されるか
 5. 言語切り替え: 日/英それぞれで正しい言語で生成されるか
 6. 履歴: 生成後に履歴に残り、再表示できるか
-7. エラー: 空入力・API キー未設定時にエラーメッセージが出るか
+7. エラー: 空入力・APIキー未設定時にトースト通知でエラーが出るか
+8. Ctrl+Enter: 各ページでショートカット生成が動作するか
+9. モバイル: 画面幅768px未満でドロワーナビが動作するか
