@@ -12,6 +12,20 @@ export async function POST(req: NextRequest) {
     });
   }
 
+  if (theme.length > 500) {
+    return new Response(JSON.stringify({ error: "テーマは500文字以内で入力してください" }), {
+      status: 400,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+
+  if ((keywords ?? "").length > 500) {
+    return new Response(JSON.stringify({ error: "キーワードは500文字以内で入力してください" }), {
+      status: 400,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+
   const prompt = blogPrompt(theme, keywords ?? "", wordCount ?? "", (lang as Language) ?? "ja");
 
   const encoder = new TextEncoder();
@@ -24,11 +38,9 @@ export async function POST(req: NextRequest) {
           const text = chunk.text();
           if (text) controller.enqueue(encoder.encode(text));
         }
-      } catch (err) {
-        const message = err instanceof Error ? err.message : "Unknown error";
-        controller.enqueue(encoder.encode(`\n\n[ERROR] ${message}`));
-      } finally {
         controller.close();
+      } catch (err) {
+        controller.error(err);
       }
     },
   });
