@@ -86,10 +86,11 @@ export default function BlogPage() {
             className="w-full md:w-72 md:shrink-0 flex flex-col gap-4"
           >
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              <label htmlFor="blog-theme" className="block text-sm font-medium text-gray-700 mb-1.5">
                 テーマ <span className="text-red-400">*</span>
               </label>
               <input
+                id="blog-theme"
                 type="text"
                 value={theme}
                 onChange={(e) => setTheme(e.target.value)}
@@ -100,10 +101,11 @@ export default function BlogPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              <label htmlFor="blog-keywords" className="block text-sm font-medium text-gray-700 mb-1.5">
                 キーワード <span className="text-gray-400 text-xs font-normal">任意</span>
               </label>
               <input
+                id="blog-keywords"
                 type="text"
                 value={keywords}
                 onChange={(e) => setKeywords(e.target.value)}
@@ -113,10 +115,11 @@ export default function BlogPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              <label htmlFor="blog-word-count" className="block text-sm font-medium text-gray-700 mb-1.5">
                 目安文字数 <span className="text-gray-400 text-xs font-normal">任意</span>
               </label>
               <select
+                id="blog-word-count"
                 value={wordCount}
                 onChange={(e) => setWordCount(e.target.value)}
                 className="w-full rounded-md border border-gray-200 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"

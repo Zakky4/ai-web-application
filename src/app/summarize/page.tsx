@@ -83,10 +83,11 @@ export default function SummarizePage() {
             className="w-full md:w-72 md:shrink-0 flex flex-col gap-4"
           >
             <div className="flex flex-col min-h-40 md:flex-1">
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              <label htmlFor="summarize-text" className="block text-sm font-medium text-gray-700 mb-1.5">
                 要約するテキスト <span className="text-red-400">*</span>
               </label>
               <textarea
+                id="summarize-text"
                 value={text}
                 onChange={(e) => setText(e.target.value)}
                 onKeyDown={(e) => {
@@ -105,8 +106,8 @@ export default function SummarizePage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">要約スタイル</label>
-              <div className="flex rounded-md border border-gray-200 overflow-hidden text-sm">
+              <p id="summarize-style-label" className="block text-sm font-medium text-gray-700 mb-1.5">要約スタイル</p>
+              <div role="group" aria-labelledby="summarize-style-label" className="flex rounded-md border border-gray-200 overflow-hidden text-sm">
                 {[
                   { value: "bullets", label: "箇条書き" },
                   { value: "paragraph", label: "段落" },

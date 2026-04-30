@@ -86,8 +86,9 @@ export default function EmailPage() {
             className="w-full md:w-72 md:shrink-0 flex flex-col gap-4"
           >
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">宛先タイプ</label>
+              <label htmlFor="email-recipient" className="block text-sm font-medium text-gray-700 mb-1.5">宛先タイプ</label>
               <select
+                id="email-recipient"
                 value={recipientType}
                 onChange={(e) => setRecipientType(e.target.value)}
                 className="w-full rounded-md border border-gray-200 px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent"
@@ -99,10 +100,11 @@ export default function EmailPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              <label htmlFor="email-purpose" className="block text-sm font-medium text-gray-700 mb-1.5">
                 用件・目的 <span className="text-red-400">*</span>
               </label>
               <textarea
+                id="email-purpose"
                 value={purpose}
                 onChange={(e) => setPurpose(e.target.value)}
                 onKeyDown={(e) => {
@@ -119,8 +121,8 @@ export default function EmailPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">トーン</label>
-              <div className="flex rounded-md border border-gray-200 overflow-hidden text-sm">
+              <p id="email-tone-label" className="block text-sm font-medium text-gray-700 mb-1.5">トーン</p>
+              <div role="group" aria-labelledby="email-tone-label" className="flex rounded-md border border-gray-200 overflow-hidden text-sm">
                 {[
                   { value: "polite", label: "丁寧" },
                   { value: "normal", label: "普通" },

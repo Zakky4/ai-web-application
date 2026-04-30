@@ -9,12 +9,13 @@ interface LanguageToggleProps {
 
 export default function LanguageToggle({ value, onChange }: LanguageToggleProps) {
   return (
-    <div className="flex rounded-md border border-gray-200 overflow-hidden text-sm">
+    <div className="flex shrink-0 rounded-md border border-gray-200 overflow-hidden text-sm">
       {(["ja", "en"] as Language[]).map((lang) => (
         <button
           key={lang}
+          type="button"
           onClick={() => onChange(lang)}
-          className={`px-3 py-1.5 transition-colors ${
+          className={`px-3 py-1.5 whitespace-nowrap transition-colors ${
             value === lang
               ? "bg-gray-900 text-white"
               : "bg-white text-gray-600 hover:bg-gray-50"
